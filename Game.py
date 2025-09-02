@@ -45,7 +45,7 @@ def ball_movement():
         restart()  # Reset the game
 
 def do_i_jumpscare():
-    if random.randint(1, 100000) == 1:
+    if random.randint(1, 1000) == 1:
         jumpscare_vfx.start_animation()
 
 def player_movement():
