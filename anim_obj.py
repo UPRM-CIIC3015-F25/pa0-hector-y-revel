@@ -15,11 +15,12 @@ class AnimatedSprite(SpriteSheet):
 
     # Macro for playing the next frame in an animation
     def animate_next_frame(self, surface):
-        self.blit(surface=surface, sprite_id=self.__anim_frames, position=self.__position)
-        self.__anim_frames += 1
+        if self.__anim_frames >= 0:
+            self.blit(surface=surface, sprite_id=self.__anim_frames, position=self.__position)
+            self.__anim_frames += 1
 
-        if self.__anim_frames >= self.sprite_count():
-            self.__anim_frames = -1
+            if self.__anim_frames >= self.sprite_count():
+                self.__anim_frames = -1
 
     # Macro for initializing an animation
     def start_animation(self):

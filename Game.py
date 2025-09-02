@@ -28,9 +28,8 @@ def ball_movement():
             paddle_touch_sound = pygame.mixer.Sound(file="deltarune-explosion.wav")
             paddle_touch_sound.set_volume(0.3)
             paddle_touch_sound.play()
-            # TODO BONUS Task: Add visual to correspond with paddle explosion sound
+            # TODO BONUS: Add visual to correspond with paddle explosion sound
             paddle_explosion_vfx.start_animation()
-
 
 
     # Ball collision with top boundary
@@ -44,6 +43,10 @@ def ball_movement():
     # Ball goes below the bottom boundary (missed by player)
     if ball.bottom > screen_height:
         restart()  # Reset the game
+
+def do_i_jumpscare():
+    if random.randint(1, 100000) == 1:
+        jumpscare_vfx.start_animation()
 
 def player_movement():
     """
@@ -66,6 +69,8 @@ def restart():
     ball_speed_y, ball_speed_x = 0, 0  # Stop ball movement
     score = 0  # Reset player score
 
+# TODO BONUS: make a start screen for the game
+
 # General setup
 pygame.mixer.pre_init(44100, -16, 1, 1024)
 pygame.init()
@@ -82,6 +87,7 @@ bg_color = pygame.Color('grey12')
 
 # Additional sprite sheets and vfx
 paddle_explosion_vfx = anim_obj.AnimatedSprite(file_path="deltarune-realistic-explosion.png", rows=3, columns=6, position=(0,0))
+jumpscare_vfx = anim_obj.AnimatedSprite(file_path="fnaf2-withered-foxy-jumpscare.png", rows=7, columns=2, position=(0,0))
 
 # Game Rectangles (ball and player paddle)
 ball = pygame.Rect(screen_width / 2 - 15, screen_height / 2 - 15, 30, 30)  # Ball (centered)
@@ -126,6 +132,7 @@ while True:
     # Game Logic
     ball_movement()
     player_movement()
+    do_i_jumpscare()
 
     # Visuals
     light_grey = pygame.Color('grey83')
@@ -136,8 +143,8 @@ while True:
     pygame.draw.ellipse(screen, light_grey, ball)  # Draw ball
     player_text = basic_font.render(f'{score}', False, light_grey)  # Render player score
     screen.blit(player_text, (screen_width/2 - 15, 10))  # Display score on screen
-    if paddle_explosion_vfx.get_frame() >= 0:
-        paddle_explosion_vfx.animate_next_frame(screen)
+    paddle_explosion_vfx.animate_next_frame(screen)
+    jumpscare_vfx.animate_next_frame(screen)
 
     # Update display
     pygame.display.flip()
