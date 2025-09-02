@@ -7,7 +7,7 @@ from pygame import Color as Colour
 # Inherits from SpriteSheet for the explicit use of playing animations
 class AnimatedSprite(SpriteSheet):
 
-    def __init__(self, file_path: str, columns: int, rows: int, position: tuple[int, int], colour_key: Colour = Colour(255, 0, 255),) -> None:
+    def __init__(self, file_path: str, columns: int, rows: int, position: tuple[int, int], colour_key: Colour = Colour(0, 0, 0),) -> None:
         SpriteSheet.__init__(self, file_path, columns, rows, colour_key)
 
         self.__anim_frames: int = -1

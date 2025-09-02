@@ -30,6 +30,7 @@ def ball_movement():
             paddle_touch_sound.play()
             # TODO BONUS: Add visual to correspond with paddle explosion sound
             paddle_explosion_vfx.start_animation()
+            paddle_explosion_vfx.update_position((ball.x - 50, ball.y - 50))
 
 
     # Ball collision with top boundary
@@ -86,12 +87,14 @@ pygame.display.set_caption('Pong')  # Set window title
 bg_color = pygame.Color('grey12')
 
 # Additional sprite sheets and vfx
-paddle_explosion_vfx = anim_obj.AnimatedSprite(file_path="deltarune-realistic-explosion.png", rows=3, columns=6, position=(0,0))
-jumpscare_vfx = anim_obj.AnimatedSprite(file_path="fnaf2-withered-foxy-jumpscare.png", rows=7, columns=2, position=(0,0))
+paddle_explosion_vfx = anim_obj.AnimatedSprite(file_path="deltarune-realistic-explosion.png", rows=3, columns=6,
+                                               position=(0,0), colour_key=pygame.Color(0,0,0))
+jumpscare_vfx = anim_obj.AnimatedSprite(file_path="fnaf2-withered-foxy-jumpscare.png", rows=7, columns=2,
+                                                            position=(0,0), colour_key=pygame.Color(0,0,0))
 
 # Game Rectangles (ball and player paddle)
 ball = pygame.Rect(screen_width / 2 - 15, screen_height / 2 - 15, 30, 30)  # Ball (centered)
-# TODO Task 1 Make the paddle bigger
+# DONE Task 1 Make the paddle bigger
 player_height = 15
 player_width = 200
 player = pygame.Rect(screen_width/2 - 45, screen_height - 20, player_width, player_height)  # Player paddle
@@ -110,7 +113,7 @@ start = False  # Indicates if the game has started
 # Main game loop
 while True:
     # Event handling
-    # TODO Task 4: Add your name
+    # DONE Task 4: Add your name
     name = "John Doe"
     for event in pygame.event.get():
         if event.type == pygame.QUIT:  # Quit the game
@@ -140,10 +143,12 @@ while True:
     blue = pygame.Color('blue')
     screen.fill(bg_color)  # Clear screen with background color
     pygame.draw.rect(screen, light_grey, player)  # Draw player paddle
-    # TODO Task 3: Change the Ball Color
+    # DONE Task 3: Change the Ball Color
     pygame.draw.ellipse(screen, blue, ball)  # Draw ball
     player_text = basic_font.render(f'{score}', False, light_grey)  # Render player score
+    user_instructions = basic_font.render('Press [SPACE] to start/reset', False, light_grey)
     screen.blit(player_text, (screen_width/2 - 15, 10))  # Display score on screen
+    screen.blit(user_instructions, (screen_width/2 - 225, 50))
     paddle_explosion_vfx.animate_next_frame(screen)
     jumpscare_vfx.animate_next_frame(screen)
 
