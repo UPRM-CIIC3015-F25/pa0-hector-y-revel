@@ -1,17 +1,19 @@
 from spritesheet import SpriteSheet
 
-import pygame
-from pygame import Surface
+# Creator of the original was british. I wanted to respect their decision, even though
+# I disagree with it.
 from pygame import Color as Colour
 
+# Inherits from SpriteSheet for the explicit use of playing animations
 class AnimatedSprite(SpriteSheet):
+
     def __init__(self, file_path: str, columns: int, rows: int, position: tuple[int, int], colour_key: Colour = Colour(255, 0, 255),) -> None:
         SpriteSheet.__init__(self, file_path, columns, rows, colour_key)
 
-        self.__anim_frames: int = 0
+        self.__anim_frames: int = -1
         self.__position = position
 
-
+    # Macro for playing the next frame in an animation
     def animate_next_frame(self, surface):
         self.blit(surface=surface, sprite_id=self.__anim_frames, position=self.__position)
         self.__anim_frames += 1
@@ -19,11 +21,14 @@ class AnimatedSprite(SpriteSheet):
         if self.__anim_frames >= self.sprite_count():
             self.__anim_frames = -1
 
+    # Macro for initializing an animation
     def start_animation(self):
         self.__anim_frames = 0
 
+    # Set new location
     def update_position(self, new_position: tuple[int, int]):
         self.__position = new_position
 
+    # Get current animation frame
     def get_frame(self):
         return self.__anim_frames
