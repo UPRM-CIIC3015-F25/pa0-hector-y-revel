@@ -1,4 +1,4 @@
-import pygame, sys, random
+import anim_obj, pygame, spritesheet, sys, random
 
 def ball_movement():
     """
@@ -24,7 +24,14 @@ def ball_movement():
             # DONE Task 2: Fix score to increase by 1
             score += 1  # Increase player score
             ball_speed_y *= -1  # Reverse ball's vertical direction
-            # TODO Task 6: Add sound effects HERE
+            # DONE Task 6: Add sound effects HERE
+            paddle_touch_sound = pygame.mixer.Sound(file="deltarune-explosion.wav")
+            paddle_touch_sound.set_volume(0.3)
+            paddle_touch_sound.play()
+            # TODO BONUS Task: Add visual to correspond with paddle explosion sound
+            paddle_explosion_vfx.start_animation()
+
+
 
     # Ball collision with top boundary
     if ball.top <= 0:
@@ -72,6 +79,9 @@ pygame.display.set_caption('Pong')  # Set window title
 
 # Colors
 bg_color = pygame.Color('grey12')
+
+# Additional sprite sheets and vfx
+paddle_explosion_vfx = anim_obj.AnimatedSprite(file_path="deltarune-realistic-explosion.png", rows=3, columns=6, position=(0,0))
 
 # Game Rectangles (ball and player paddle)
 ball = pygame.Rect(screen_width / 2 - 15, screen_height / 2 - 15, 30, 30)  # Ball (centered)
@@ -126,6 +136,8 @@ while True:
     pygame.draw.ellipse(screen, light_grey, ball)  # Draw ball
     player_text = basic_font.render(f'{score}', False, light_grey)  # Render player score
     screen.blit(player_text, (screen_width/2 - 15, 10))  # Display score on screen
+    if paddle_explosion_vfx.get_frame() >= 0:
+        paddle_explosion_vfx.animate_next_frame(screen)
 
     # Update display
     pygame.display.flip()
