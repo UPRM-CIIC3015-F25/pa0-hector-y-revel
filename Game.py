@@ -28,7 +28,7 @@ def ball_movement():
             paddle_touch_sound = pygame.mixer.Sound(file="deltarune-explosion.wav")
             paddle_touch_sound.set_volume(0.3)
             paddle_touch_sound.play()
-            # TODO BONUS: Add visual to correspond with paddle explosion sound
+            # DONE BONUS: Add visual to correspond with paddle explosion sound
             paddle_explosion_vfx.start_animation()
             paddle_explosion_vfx.update_position((ball.x - 50, ball.y - 50))
 
@@ -48,6 +48,10 @@ def ball_movement():
 def do_i_jumpscare():
     if random.randint(1, 1000) == 1:
         jumpscare_vfx.start_animation()
+
+        jumpscare_sfx = pygame.mixer.Sound(file="fnaf2-jumpscare-sound.wav")
+        jumpscare_sfx.set_volume(0.1)
+        jumpscare_sfx.play()
 
 def player_movement():
     """
@@ -87,10 +91,8 @@ pygame.display.set_caption('Pong')  # Set window title
 bg_color = pygame.Color('grey12')
 
 # Additional sprite sheets and vfx
-paddle_explosion_vfx = anim_obj.AnimatedSprite(file_path="deltarune-realistic-explosion.png", rows=3, columns=6,
-                                               position=(0,0), colour_key=pygame.Color(0,0,0))
-jumpscare_vfx = anim_obj.AnimatedSprite(file_path="fnaf2-withered-foxy-jumpscare.png", rows=7, columns=2,
-                                                            position=(0,0), colour_key=pygame.Color(0,0,0))
+paddle_explosion_vfx = anim_obj.AnimatedSprite(file_path="deltarune-realistic-explosion.png", rows=3, columns=6, position=(0,0))
+jumpscare_vfx = anim_obj.AnimatedSprite(file_path="fnaf2-withered-foxy-jumpscare.png", rows=7, columns=2, position=(0,0))
 
 # Game Rectangles (ball and player paddle)
 ball = pygame.Rect(screen_width / 2 - 15, screen_height / 2 - 15, 30, 30)  # Ball (centered)
