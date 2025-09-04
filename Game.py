@@ -30,6 +30,7 @@ def ball_movement():
             paddle_touch_sound.play()
             # DONE BONUS: Add visual to correspond with paddle explosion sound
             paddle_explosion_vfx.start_animation()
+            paddle_explosion_vfx.update_position((ball.x, ball.y - 50))
 
 
     # Ball collision with top boundary
@@ -42,8 +43,10 @@ def ball_movement():
 
     # Ball goes below the bottom boundary (missed by player)
     if ball.bottom > screen_height:
-        restart()  # Reset the game
+        global game_over
+        game_over = True  # Display game over screen
 
+# Two separate logics for two different jumpscares
 def do_i_jumpscare():
     if random.randint(1, 1000) == 1:
         jumpscare_vfx.start_animation()
@@ -68,6 +71,7 @@ def restart():
     """
     Resets the ball and player scores to the initial state.
     """
+
     global ball_speed_x, ball_speed_y, score
     ball.center = (screen_width / 2, screen_height / 2)  # Reset ball position to center
     ball_speed_y, ball_speed_x = 0, 0  # Stop ball movement
@@ -90,16 +94,20 @@ pygame.display.set_caption('Pong')  # Set window title
 bg_color = pygame.Color('grey12')
 
 # Game Rectangles (ball and player paddle)
-ball = pygame.Rect(screen_width / 2 - 15, screen_height / 2 - 15, 30, 30)  # Ball (centered)
+ball_start_pos_xy = int(screen_width / 2 - 15)
+ball = pygame.Rect(ball_start_pos_xy, ball_start_pos_xy, 30, 30)  # Ball (centered)
 # DONE Task 1 Make the paddle bigger
 player_height = 15
 player_width = 250
-player = pygame.Rect(screen_width/2 - 45, screen_height - 20, player_width, player_height)  # Player paddle
+player_start_pos_x = int(screen_width/2 - 90)
+player_start_pos_y = screen_height - 20
+player = pygame.Rect(player_start_pos_x, player_start_pos_y, player_width, player_height)  # Player paddle
 
  # Additional visuals
 paddle_explosion_vfx = anim_obj.AnimatedSprite(file_path="deltarune-realistic-explosion.png", rows=3, columns=6, position=(ball.x, ball.y))
 jumpscare_vfx = anim_obj.AnimatedSprite(file_path="fnaf2-withered-foxy-jumpscare.png", rows=7, columns=2, position=(0,0))
 lebumbum = pygame.image.load('lebumbum.png')
+pygame.transform.scale(lebumbum, (screen_height, screen_width))
 
 # Game Variables
 ball_speed_x = 0
@@ -108,9 +116,10 @@ player_speed = 0
 
 # Score Text setup
 score = 0
+game_over = False
 basic_font = pygame.font.Font('freesansbold.ttf', 32)  # Font for displaying score
 
-start = False  # Indicates if the game has started
+start = False # Indicates if the game has started
 
 # Main game loop
 while True:
@@ -126,7 +135,12 @@ while True:
                 player_speed -= 6  # Move paddle left
             if event.key == pygame.K_RIGHT:
                 player_speed += 6  # Move paddle right
+            # Restart game
             if event.key == pygame.K_SPACE:
+                score = 0
+                ball.x, ball.y = ball_start_pos_xy, ball_start_pos_xy
+                player.x, player.y = player_start_pos_x, player_start_pos_y
+                game_over = False
                 start = True  # Start the ball movement
         if event.type == pygame.KEYUP:
             if event.key == pygame.K_LEFT:
@@ -134,25 +148,38 @@ while True:
             if event.key == pygame.K_RIGHT:
                 player_speed -= 6  # Stop moving right
 
-    # Game Logic
-    ball_movement()
-    player_movement()
-    do_i_jumpscare()
-    maid()
-
-    # Visuals
+    # Visual declarations
     light_grey = pygame.Color('grey83')
     red = pygame.Color('red')
     blue = pygame.Color('blue')
-    screen.fill(bg_color)  # Clear screen with background color
-    pygame.draw.rect(screen, light_grey, player)  # Draw player paddle
-    # DONE Task 3: Change the Ball Color
-    pygame.draw.ellipse(screen, blue, ball)  # Draw ball
-    player_text = basic_font.render(f'{score}', False, light_grey)  # Render player score
-    screen.blit(player_text, (screen_width/2 - 15, 10))  # Display score on screen
-    maid()
-    paddle_explosion_vfx.animate_next_frame(screen)
-    jumpscare_vfx.animate_next_frame(screen)
+
+    if not game_over:
+
+        # Game Logic
+        ball_movement()
+        player_movement()
+        do_i_jumpscare()
+        maid()
+
+        # Visuals
+        screen.fill(bg_color)  # Clear screen with background color
+        pygame.draw.rect(screen, light_grey, player)  # Draw player paddle
+        # DONE Task 3: Change the Ball Color
+        pygame.draw.ellipse(screen, blue, ball)  # Draw ball
+        player_text = basic_font.render(f'{score}', False, light_grey)  # Render player score
+        screen.blit(player_text, (screen_width/2 - 15, 10))  # Display score on screen
+        maid()
+        paddle_explosion_vfx.animate_next_frame(screen)
+        jumpscare_vfx.animate_next_frame(screen)
+
+    else:
+        # Render Game Over text
+        gameover_text = basic_font.render(f'Game Over! Final score: {score}', False, light_grey)
+        restart_text = basic_font.render(f'Press [SPACE] to restart', False, light_grey)
+        # Display Game Over on screen
+        screen.blit(gameover_text, (screen_width/2 - 200, screen_height/2 - 50))
+        screen.blit(restart_text, (screen_width/2 - 200, screen_height/2 - 20))
+
 
 
     # Update display
