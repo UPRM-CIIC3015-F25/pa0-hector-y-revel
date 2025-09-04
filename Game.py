@@ -47,6 +47,9 @@ def ball_movement():
 def do_i_jumpscare():
     if random.randint(1, 1000) == 1:
         jumpscare_vfx.start_animation()
+def maid():
+    if random.randint(1, 1000) == 1:
+        lebumbum.start_animation()
 
 def player_movement():
     """
@@ -88,6 +91,7 @@ bg_color = pygame.Color('grey12')
 # Additional sprite sheets and vfx
 paddle_explosion_vfx = anim_obj.AnimatedSprite(file_path="deltarune-realistic-explosion.png", rows=3, columns=6, position=(0,0))
 jumpscare_vfx = anim_obj.AnimatedSprite(file_path="fnaf2-withered-foxy-jumpscare.png", rows=7, columns=2, position=(0,0))
+lebumbum = anim_obj.AnimatedSprite(file_path="lebumbum.png", rows=7, columns=2, position=(0,0))
 
 # Game Rectangles (ball and player paddle)
 ball = pygame.Rect(screen_width / 2 - 15, screen_height / 2 - 15, 30, 30)  # Ball (centered)
@@ -133,6 +137,7 @@ while True:
     ball_movement()
     player_movement()
     do_i_jumpscare()
+    maid()
 
     # Visuals
     light_grey = pygame.Color('grey83')
@@ -146,6 +151,7 @@ while True:
     screen.blit(player_text, (screen_width/2 - 15, 10))  # Display score on screen
     paddle_explosion_vfx.animate_next_frame(screen)
     jumpscare_vfx.animate_next_frame(screen)
+    lebumbum.animate_next_frame(screen)
 
     # Update display
     pygame.display.flip()
