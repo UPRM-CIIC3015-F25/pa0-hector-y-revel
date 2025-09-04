@@ -46,14 +46,11 @@ def ball_movement():
 
 def do_i_jumpscare():
     if random.randint(1, 1000) == 1:
-        match random.randint(0,1):
-            case 0:
-                jumpscare_vfx.start_animation()
-            case 1:
-                lebumbum.start_animation()
+        jumpscare_vfx.start_animation()
 def maid():
     if random.randint(1, 1000) == 1:
-        lebumbum.start_animation()
+        screen.blit(lebumbum, (0, 0))
+
 
 def player_movement():
     """
@@ -92,17 +89,17 @@ pygame.display.set_caption('Pong')  # Set window title
 # Colors
 bg_color = pygame.Color('grey12')
 
-# Additional sprite sheets and vfx
-paddle_explosion_vfx = anim_obj.AnimatedSprite(file_path="deltarune-realistic-explosion.png", rows=3, columns=6, position=(0,0))
-jumpscare_vfx = anim_obj.AnimatedSprite(file_path="fnaf2-withered-foxy-jumpscare.png", rows=7, columns=2, position=(0,0))
-lebumbum = anim_obj.AnimatedSprite(file_path="lebumbum.png", rows=1, columns=1, position=(0,0))
-
 # Game Rectangles (ball and player paddle)
 ball = pygame.Rect(screen_width / 2 - 15, screen_height / 2 - 15, 30, 30)  # Ball (centered)
 # DONE Task 1 Make the paddle bigger
 player_height = 15
-player_width = 200
+player_width = 250
 player = pygame.Rect(screen_width/2 - 45, screen_height - 20, player_width, player_height)  # Player paddle
+
+ # Additional visuals
+paddle_explosion_vfx = anim_obj.AnimatedSprite(file_path="deltarune-realistic-explosion.png", rows=3, columns=6, position=(ball.x, ball.y))
+jumpscare_vfx = anim_obj.AnimatedSprite(file_path="fnaf2-withered-foxy-jumpscare.png", rows=7, columns=2, position=(0,0))
+lebumbum = pygame.image.load('lebumbum.png')
 
 # Game Variables
 ball_speed_x = 0
@@ -153,9 +150,10 @@ while True:
     pygame.draw.ellipse(screen, blue, ball)  # Draw ball
     player_text = basic_font.render(f'{score}', False, light_grey)  # Render player score
     screen.blit(player_text, (screen_width/2 - 15, 10))  # Display score on screen
+    maid()
     paddle_explosion_vfx.animate_next_frame(screen)
     jumpscare_vfx.animate_next_frame(screen)
-    lebumbum.animate_next_frame(screen)
+
 
     # Update display
     pygame.display.flip()
