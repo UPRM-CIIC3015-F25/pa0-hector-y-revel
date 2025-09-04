@@ -11,7 +11,7 @@ def ball_movement():
     ball.y += ball_speed_y
 
     # Start the ball movement when the game begins
-    # TODO Task 5 Create a Merge Conflict
+    # DONE Task 5 Create a Merge Conflict
     speed = 8
     if start:
         ball_speed_x = speed * random.choice((1, -1))  # Randomize initial horizontal direction
@@ -28,7 +28,7 @@ def ball_movement():
             paddle_touch_sound = pygame.mixer.Sound(file="deltarune-explosion.wav")
             paddle_touch_sound.set_volume(0.3)
             paddle_touch_sound.play()
-            # TODO BONUS: Add visual to correspond with paddle explosion sound
+            # DONE BONUS: Add visual to correspond with paddle explosion sound
             paddle_explosion_vfx.start_animation()
 
 
@@ -46,7 +46,11 @@ def ball_movement():
 
 def do_i_jumpscare():
     if random.randint(1, 1000) == 1:
-        jumpscare_vfx.start_animation()
+        match random.randint(0,1):
+            case 0:
+                jumpscare_vfx.start_animation()
+            case 1:
+                lebumbum.start_animation()
 def maid():
     if random.randint(1, 1000) == 1:
         lebumbum.start_animation()
@@ -91,11 +95,11 @@ bg_color = pygame.Color('grey12')
 # Additional sprite sheets and vfx
 paddle_explosion_vfx = anim_obj.AnimatedSprite(file_path="deltarune-realistic-explosion.png", rows=3, columns=6, position=(0,0))
 jumpscare_vfx = anim_obj.AnimatedSprite(file_path="fnaf2-withered-foxy-jumpscare.png", rows=7, columns=2, position=(0,0))
-lebumbum = anim_obj.AnimatedSprite(file_path="lebumbum.png", rows=7, columns=2, position=(0,0))
+lebumbum = anim_obj.AnimatedSprite(file_path="lebumbum.png", rows=1, columns=1, position=(0,0))
 
 # Game Rectangles (ball and player paddle)
 ball = pygame.Rect(screen_width / 2 - 15, screen_height / 2 - 15, 30, 30)  # Ball (centered)
-# TODO Task 1 Make the paddle bigger
+# DONE Task 1 Make the paddle bigger
 player_height = 15
 player_width = 200
 player = pygame.Rect(screen_width/2 - 45, screen_height - 20, player_width, player_height)  # Player paddle
@@ -114,7 +118,7 @@ start = False  # Indicates if the game has started
 # Main game loop
 while True:
     # Event handling
-    # TODO Task 4: Add your name
+    # DONE Task 4: Add your name
     name = "John Doe"
     for event in pygame.event.get():
         if event.type == pygame.QUIT:  # Quit the game
@@ -145,7 +149,7 @@ while True:
     blue = pygame.Color('blue')
     screen.fill(bg_color)  # Clear screen with background color
     pygame.draw.rect(screen, light_grey, player)  # Draw player paddle
-    # TODO Task 3: Change the Ball Color
+    # DONE Task 3: Change the Ball Color
     pygame.draw.ellipse(screen, blue, ball)  # Draw ball
     player_text = basic_font.render(f'{score}', False, light_grey)  # Render player score
     screen.blit(player_text, (screen_width/2 - 15, 10))  # Display score on screen
