@@ -1,4 +1,4 @@
-import anim_obj, pygame, spritesheet, sys, random
+import anim_obj, pygame, sys, random
 
 def ball_movement():
     """
@@ -77,7 +77,21 @@ def restart():
     ball_speed_y, ball_speed_x = 0, 0  # Stop ball movement
     score = 0  # Reset player score
 
-# TODO BONUS: make a start screen for the game
+# Menu logic (this took so much trial and error, not even god can help me now... all the crashouts)
+def menu():
+    while True:
+        screen.fill('black')
+        start_text = basic_font.render(f'Press [SPACE] to start', False, light_grey)
+        screen.blit(start_text, (screen_width / 2 - 200, screen_height / 2 - 20))
+        pygame.display.flip()
+
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT:
+                sys.exit()
+
+            if event.type == pygame.KEYDOWN:
+                if event.key == pygame.K_SPACE:
+                    return
 
 # General setup
 pygame.mixer.pre_init(44100, -16, 1, 1024)
@@ -114,12 +128,21 @@ ball_speed_x = 0
 ball_speed_y = 0
 player_speed = 0
 
+# Visual declarations
+light_grey = pygame.Color('grey83')
+red = pygame.Color('red')
+blue = pygame.Color('blue')
+
 # Score Text setup
 score = 0
 game_over = False
 basic_font = pygame.font.Font('freesansbold.ttf', 32)  # Font for displaying score
 
 start = False # Indicates if the game has started
+begin = False
+
+# Displays start menu
+menu()
 
 # Main game loop
 while True:
@@ -148,10 +171,6 @@ while True:
             if event.key == pygame.K_RIGHT:
                 player_speed -= 6  # Stop moving right
 
-    # Visual declarations
-    light_grey = pygame.Color('grey83')
-    red = pygame.Color('red')
-    blue = pygame.Color('blue')
 
     if not game_over:
 
