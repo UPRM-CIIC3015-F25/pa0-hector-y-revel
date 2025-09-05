@@ -1,4 +1,4 @@
-import anim_obj, pygame, sys, random
+import anim_obj, pygame, sys, random, boss
 
 def ball_movement():
     """
@@ -71,7 +71,6 @@ def restart():
     """
     Resets the ball and player scores to the initial state.
     """
-
     global ball_speed_x, ball_speed_y, score
     ball.center = (screen_width / 2, screen_height / 2)  # Reset ball position to center
     ball_speed_y, ball_speed_x = 0, 0  # Stop ball movement
@@ -123,10 +122,20 @@ jumpscare_vfx = anim_obj.AnimatedSprite(file_path="fnaf2-withered-foxy-jumpscare
 lebumbum = pygame.image.load('lebumbum.png')
 pygame.transform.scale(lebumbum, (screen_height, screen_width))
 
+# Boss
+enemy = boss.Demon(x=200, y=300, image_path="cacodemon.png", speed=2, move=150)
 # Game Variables
 ball_speed_x = 0
 ball_speed_y = 0
 player_speed = 0
+# Music
+pygame.mixer.set_num_channels(8)
+channel_0 = pygame.mixer.Channel(0)
+pygame.mixer.music.set_volume(0.2)
+pygame.mixer.music.load('theworld.mp3')
+pygame.mixer.music.load('a_cruel_angels_thesis_8-bit_cover_neon_genesis_evangelion_op.wav')
+pygame.mixer.fadeout(1000)
+pygame.mixer.music.play(-1, 0.0)
 
 # Visual declarations
 light_grey = pygame.Color('grey83')
@@ -141,11 +150,16 @@ basic_font = pygame.font.Font('freesansbold.ttf', 32)  # Font for displaying sco
 start = False # Indicates if the game has started
 begin = False
 
+pygame.mixer.unpause()
 # Displays start menu
 menu()
 
 # Main game loop
 while True:
+
+    boss.Demon.update(enemy)
+    boss.Demon.draw(enemy, screen)
+
     # Event handling
     # DONE Task 4: Add your name
     name = "John Doe"
@@ -174,6 +188,7 @@ while True:
 
     if not game_over:
 
+        pygame.mixer.unpause()
         # Game Logic
         ball_movement()
         player_movement()
@@ -190,6 +205,7 @@ while True:
         maid()
         paddle_explosion_vfx.animate_next_frame(screen)
         jumpscare_vfx.animate_next_frame(screen)
+        pygame.mixer.music.unpause()
 
     else:
         # Render Game Over text
@@ -198,7 +214,8 @@ while True:
         # Display Game Over on screen
         screen.blit(gameover_text, (screen_width/2 - 200, screen_height/2 - 50))
         screen.blit(restart_text, (screen_width/2 - 200, screen_height/2 - 20))
-
+        pygame.mixer.music.pause()
+        pygame.mixer.music.play()
 
 
     # Update display
