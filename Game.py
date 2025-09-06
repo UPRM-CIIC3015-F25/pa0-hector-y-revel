@@ -74,6 +74,16 @@ def get_big_bossed():
     pygame.mixer.music.load(big_boss_mus)
     pygame.mixer.music.play(-1)
 
+# Things to do once the boss is dead
+def on_boss_death():
+    global main_music_playing
+
+    # Reset music to normal
+    pygame.mixer.music.stop()
+    pygame.mixer.music.load(main_theme)
+    pygame.mixer.music.play(-1)
+    main_music_playing = True
+
 # Things to do once in a game over
 def on_game_over():
     global boss_music_playing
@@ -262,6 +272,7 @@ while True:
                 player_speed += 6  # Move paddle right
             # Restart game
             if event.key == pygame.K_SPACE:
+                timer = TIMER_RESET
                 restart()
 
         if event.type == pygame.KEYUP:
@@ -299,6 +310,10 @@ while True:
         if timer <= 0:
             timer = TIMER_RESET
             get_big_bossed()
+
+        # Check if boss is dead to execute boss death protocol
+        if boss_music_playing and boss.is_dead():
+            on_boss_death()
 
     else:
         # Game over... logic?

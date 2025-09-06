@@ -179,6 +179,9 @@ class Demon:
                 if not ball.to_remove:
                     ball.draw(surface)
 
+    def is_dead(self):
+        return self.to_remove
+
 # Kills this SOB
 def remove_enemies(enemies_list):
     return [enemy for enemy in enemies_list if not enemy.to_remove]
