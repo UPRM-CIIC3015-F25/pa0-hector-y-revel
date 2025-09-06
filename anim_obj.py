@@ -22,10 +22,11 @@ class AnimatedSprite(SpriteSheet):
             self.blit(surface=surface, sprite_id=self.__anim_frames, position=self.__position)
             self.__anim_frames += 1
 
-            if (self.__anim_frames >= self.sprite_count()) and not self.__can_loop:
-                self.__anim_frames = -1
-            else:
-                self.__anim_frames = 0
+            if self.__anim_frames >= self.sprite_count():
+                if not self.__can_loop:
+                    self.__anim_frames = -1
+                else:
+                    self.__anim_frames = 0
 
     # Macro for initializing an animation
     def start_animation(self):
