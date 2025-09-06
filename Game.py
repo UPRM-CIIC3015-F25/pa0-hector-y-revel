@@ -200,9 +200,6 @@ def win_screen():
         screen.blit(final_score, (screen_width / 2 - 200, screen_height / 2 - 150))
         screen.blit(congrats, (screen_width / 2 - 200, screen_height / 2 - 200))
         tenna_gif_vfx.animate_next_frame(screen)
-        do_i_jumpscare()
-        if juampscare:
-            jumpscare_vfx.animate_next_frame(screen)
 
         pygame.display.flip()
 
