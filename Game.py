@@ -50,35 +50,27 @@ def ball_movement():
     if ball.bottom > screen_height:
         global game_over
         game_over = True  # Display game over screen
-        on_game_over() # Do game over logic
 
 # Two separate logics for two different jumpscares
 def do_i_jumpscare():
     global juampscare
-    if (random.randint(1, 500) == 1) and (juampscare == False):
+    if (random.randint(1, 50) == 1) and (juampscare == False):
         jumpscare_sfx = pygame.mixer.Sound(file="fnaf2-jumpscare-sound.wav")
         jumpscare_sfx.play()
         jumpscare_vfx.start_animation()
         juampscare = True
 
 def maid():
-    if random.randint(1, 10000) == 1:
+    if random.randint(1, 1000) == 1:
         screen.blit(lebumbum, (0, 0))
 
 def get_big_bossed():
-    # Display Big Boss for a frame
-    screen.blit(big_boss, (screen_width / 2, screen_height / 2))
-
-    # Reset music for big boss
-    pygame.mixer.music.stop()
-    pygame.mixer.music.load(big_boss_mus)
-    pygame.mixer.music.play(-1)
-
-# Things to do once in a game over
-def on_game_over():
-    global boss_music_playing
-    pygame.mixer.music.stop()
-
+    if timer == 0:
+        pygame.mixer.music.stop()
+        bossed = pygame.mixer.Sound(file="invisible-duran.mp3")
+        bossed.set_volume(0.5)
+        bossed.play()
+        screen.blit(big_boss, (0, 0))
 
 def player_movement():
     """
@@ -92,31 +84,14 @@ def player_movement():
     if player.right >= screen_width:
         player.right = screen_width
 
-# Restart
 def restart():
     """
-    Resets the ball and player scores to the initial state, unpauses music
+    Resets the ball and player scores to the initial state.
     """
-    global ball_speed_x, ball_speed_y, score, game_over, juampscare, start, main_music_playing
-
-    # Reset positions
-    ball.center = (ball_start_pos_xy, ball_start_pos_xy)  # Reset ball position to center
-    player.center = (player_start_pos_x, player_start_pos_y) # Reset player position to start
+    global ball_speed_x, ball_speed_y, score
+    ball.center = (screen_width / 2, screen_height / 2)  # Reset ball position to center
     ball_speed_y, ball_speed_x = 0, 0  # Stop ball movement
-
-    # Reset globals
-    game_over = False
-    juampscare = False
-    start = True  # Start the ball movement
     score = 0  # Reset player score
-
-    # Reset music for new game
-    pygame.mixer.music.stop()
-    pygame.mixer.music.load(main_theme)
-    pygame.mixer.music.play(-1)
-    main_music_playing = True
-
-    pygame.mixer.unpause()  # Play music
 
 # Menu logic (this took so much trial and error, not even god can help me now... all the crashouts)
 def menu():
@@ -145,10 +120,13 @@ def menu():
 
             if event.type == pygame.KEYDOWN:
                 if event.key == pygame.K_SPACE:
-                    restart()
+                    # Reset music for new game
+                    pygame.mixer.music.stop()
+                    pygame.mixer.music.load(main_theme)
+                    pygame.mixer.music.play(-1)
+                    main_music_playing = True
                     return
 
-# Determine whether boss should drop
 def boss_drop():
     global boss_music_playing
 
@@ -186,7 +164,7 @@ ball = pygame.Rect(ball_start_pos_xy, ball_start_pos_xy, 30, 30)  # Ball (center
 # DONE Task 1 Make the paddle bigger
 player_height = 15
 player_width = 250
-player_start_pos_x = int(screen_width/2 + 90)
+player_start_pos_x = int(screen_width/2 - 90)
 player_start_pos_y = screen_height - 20
 player = pygame.Rect(player_start_pos_x, player_start_pos_y, player_width, player_height)  # Player paddle
 
@@ -218,7 +196,6 @@ channel_0 = pygame.mixer.Channel(0)
 pygame.mixer.music.set_volume(0.6)
 main_theme = 'a_cruel_angels_thesis_8-bit_cover_neon_genesis_evangelion_op.wav'
 boss_theme = "standing_here.wav"
-big_boss_mus = "invisible-duran.mp3"
 
 # Visual declarations
 light_grey = pygame.Color('grey83')
@@ -236,16 +213,14 @@ begin = False
 juampscare = False
 
 pygame.mixer.unpause()
-
 # Displays start menu
 menu()
 
-# The funny timer
-TIMER_RESET = 7000
-timer = TIMER_RESET
-
 # Main game loop
+timer = 100000
+
 while True:
+
     # He boss
     # Event handling
     # DONE Task 4: Add your name
@@ -261,8 +236,12 @@ while True:
                 player_speed += 6  # Move paddle right
             # Restart game
             if event.key == pygame.K_SPACE:
-                restart()
-
+                score = 0
+                ball.x, ball.y = ball_start_pos_xy, ball_start_pos_xy
+                player.x, player.y = player_start_pos_x, player_start_pos_y
+                game_over = False
+                juampscare = False
+                start = True  # Start the ball movement
         if event.type == pygame.KEYUP:
             if event.key == pygame.K_LEFT:
                 player_speed += 6  # Stop moving left
@@ -274,10 +253,11 @@ while True:
 
         timer -= 1
         print(timer)
-
+        pygame.mixer.unpause()
         # Game Logic
         ball_movement()
         player_movement()
+        maid()
         boss.update(ball, [ball_speed_x, ball_speed_y])
 
         # Visuals
@@ -287,37 +267,35 @@ while True:
         pygame.draw.ellipse(screen, blue, ball)  # Draw ball
         player_text = basic_font.render(f'{score}', False, light_grey)  # Render player score
         screen.blit(player_text, (screen_width/2 - 15, 10))  # Display score on screen
-        maid() # maid
-
+        get_big_bossed()
+        maid()
         # Boss draw come back
         boss_drop()
         paddle_explosion_vfx.animate_next_frame(screen)
         jumpscare_vfx.animate_next_frame(screen)
-
-        # Get big bossed when the timer hits zero
-        if timer <= 0:
-            timer = TIMER_RESET
-            get_big_bossed()
+        pygame.mixer.music.unpause()
 
     else:
-        # Game over... logic?
-        do_i_jumpscare()
-
         # Render Game Over text
         gameover_text = basic_font.render(f'Game Over! Final score: {score}', False, light_grey)
         restart_text = basic_font.render(f'Press [SPACE] to restart', False, light_grey)
         # Display Game Over on screen
         screen.blit(gameover_text, (screen_width/2 - 200, screen_height/2 - 50))
         screen.blit(restart_text, (screen_width/2 - 200, screen_height/2 - 20))
+        pygame.mixer.music.pause()
+        pygame.mixer.music.play()
+        pygame.mixer.music.stop()
+        pygame.mixer.music.load(boss_theme)
+        pygame.mixer.music.play(-1)
+        boss_music_playing = True
 
-        # Other visuals
+        do_i_jumpscare()
         if juampscare:
             jumpscare_vfx.animate_next_frame(screen)
 
 
 
 
-
-    # Update display
+# Update display
     pygame.display.flip()
     clock.tick(60)  # Maintain 60 frames per second
