@@ -179,6 +179,10 @@ class Demon:
                 if not ball.to_remove:
                     ball.draw(surface)
 
+    def reset(self):
+        self.health = 150
+        self.to_remove = False
+
     def is_dead(self):
         return self.to_remove
 

@@ -59,10 +59,10 @@ def ball_movement():
 # Two separate logics for two different jumpscares
 def do_i_jumpscare():
     global juampscare
-    if (random.randint(1, 500) == 1) and (juampscare == False):
+    if (random.randint(1, 1000) == 1) and (juampscare == False):
         jumpscare_sfx = pygame.mixer.Sound(file="fnaf2-jumpscare-sound.wav")
         jumpscare_sfx.play()
-        jumpscare_vfx.start_animation()
+        jumpscare_vfx.start_animation(hang_over=50)
         juampscare = True
 
 def maid():
@@ -116,7 +116,7 @@ def restart():
     """
     Resets the ball and player scores to the initial state, unpauses music
     """
-    global ball_speed_x, ball_speed_y, score, game_over, juampscare, start, main_music_playing
+    global ball_speed_x, ball_speed_y, score, game_over, juampscare, start, main_music_playing, boss_music_playing
 
     # Reset positions
     ball.center = (ball_start_pos_xy, ball_start_pos_xy)  # Reset ball position to center
@@ -134,6 +134,9 @@ def restart():
     pygame.mixer.music.load(game_mus)
     pygame.mixer.music.play(-1)
     main_music_playing = True
+    boss_music_playing = False
+
+    boss.reset() # Reset boss so he isn't weaker or dead on reset
 
     pygame.mixer.unpause()  # Play music
 
@@ -170,12 +173,16 @@ def menu():
 
 
 def win_screen():
-    global boss_music_playing, main_music_playing, win_screen_music_playing
+    global boss_music_playing, main_music_playing, win_screen_music_playing, juampscare
 
     # Reset music states when returning to menu
     boss_music_playing = False
     main_music_playing = False
     win_screen_music_playing = False
+
+    # Start animations
+    tenna_gif_vfx.start_animation()
+    screen.fill('black') # Feel free to put this back in the display loop, i was just trying to see if Foxy stuck but nah
 
     while True:
         if not pygame.mixer.music.get_busy():
@@ -183,7 +190,7 @@ def win_screen():
             pygame.mixer.music.play(-1, 0.0)
             win_screen_music_playing = True
 
-        screen.fill('black')
+
         congrats = basic_font.render(f'YOU BEAT THE BOSS!!!', False, light_grey)
         final_score = basic_font.render(f'Your final score is {score}', False, light_grey)
         message = basic_font.render(f'Now give us our award...', False, light_grey)
@@ -192,6 +199,11 @@ def win_screen():
         screen.blit(message, (screen_width / 2 - 200, screen_height / 2 - 100))
         screen.blit(final_score, (screen_width / 2 - 200, screen_height / 2 - 150))
         screen.blit(congrats, (screen_width / 2 - 200, screen_height / 2 - 200))
+        tenna_gif_vfx.animate_next_frame(screen)
+        do_i_jumpscare()
+        if juampscare:
+            jumpscare_vfx.animate_next_frame(screen)
+
         pygame.display.flip()
 
         for event in pygame.event.get():
@@ -200,11 +212,7 @@ def win_screen():
 
             if event.type == pygame.KEYDOWN:
                 if event.key == pygame.K_SPACE:
-                    pygame.mixer.music.stop()
-                    pygame.mixer.music.load(main_theme)
-                    pygame.mixer.music.play(-1)
-                    main_music_playing = True
-                    menu()
+                    restart()
                     return
 
 # Determine whether boss should drop
@@ -250,8 +258,12 @@ player_start_pos_y = screen_height - 20
 player = pygame.Rect(player_start_pos_x, player_start_pos_y, player_width, player_height)  # Player paddle
 
  # Additional visuals
-paddle_explosion_vfx = anim_obj.AnimatedSprite(file_path="deltarune-realistic-explosion.png", rows=3, columns=6, position=(ball.x, ball.y))
-jumpscare_vfx = anim_obj.AnimatedSprite(file_path="fnaf2-withered-foxy-jumpscare.png", rows=2, columns=7, position=(0,0))
+paddle_explosion_vfx = anim_obj.AnimatedSprite(file_path="deltarune-realistic-explosion.png", rows=3, columns=6,
+                                               position=(0, 0))
+jumpscare_vfx = anim_obj.AnimatedSprite(file_path="fnaf2-withered-foxy-jumpscare.png", rows=2, columns=7,
+                                        position=(0,0))
+tenna_gif_vfx = anim_obj.AnimatedSprite(file_path="tenna-dancing-gif.png", rows=8, columns=13,
+                                        position=(screen_width - 100, screen_height - 200), looping=True)
 lebumbum = pygame.image.load('lebumbum.png')
 big_boss = pygame.image.load('big_boss.png')
 pygame.transform.scale(lebumbum, (screen_height, screen_width))
@@ -357,8 +369,6 @@ while True:
         boss_drop()
         paddle_explosion_vfx.animate_next_frame(screen)
         jumpscare_vfx.animate_next_frame(screen)
-
-        # Get big bossed when the timer hits zero
 
         # Check if boss is dead to execute boss death protocol
         if boss_music_playing and boss.is_dead():
