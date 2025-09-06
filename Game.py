@@ -1,7 +1,5 @@
 import anim_obj, pygame, sys, random, boss
 
-# Solved a scary merge conflict
-
 # Music state tracking
 boss_music_playing = False
 main_music_playing = False
@@ -243,11 +241,12 @@ pygame.mixer.unpause()
 menu()
 
 # The funny timer
-TIMER_RESET = 8000
+TIMER_RESET = 7000
 timer = TIMER_RESET
 
 # Main game loop
 while True:
+
     # He boss
     # Event handling
     # DONE Task 4: Add your name
@@ -319,7 +318,6 @@ while True:
 
 
 
-
-    # Update display
+# Update display
     pygame.display.flip()
     clock.tick(60)  # Maintain 60 frames per second
