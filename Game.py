@@ -243,7 +243,7 @@ pygame.mixer.unpause()
 menu()
 
 # The funny timer
-TIMER_RESET = 7000
+TIMER_RESET = 8000
 timer = TIMER_RESET
 
 # Main game loop
