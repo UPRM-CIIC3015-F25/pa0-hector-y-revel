@@ -9,6 +9,7 @@ class EnemyBall:
         self.speed_x = random.choice([-3, 3])
         self.speed_y = -3
         self.screen_width = screen_width
+        self.to_remove = False  # Flag to mark for removal
 
     def update(self):
         self.x += self.speed_x
@@ -22,7 +23,6 @@ class EnemyBall:
             self.x = self.screen_width - self.radius
             self.speed_x *= -1
 
-        # ✅ Bounce on top
         if self.y - self.radius <= 0:
             self.y = self.radius
             self.speed_y *= -1
@@ -30,7 +30,7 @@ class EnemyBall:
     def check_ball_collision(self, ball_rect, ball_speed):
         dx = self.x - ball_rect.centerx
         dy = self.y - ball_rect.centery
-        dist = max((dx**2 + dy**2)**0.5, 0.1)
+        dist = max((dx ** 2 + dy ** 2) ** 0.5, 0.1)
         combined_radius = self.radius + ball_rect.width / 2
 
         if dist < combined_radius:
@@ -56,36 +56,32 @@ class EnemyBall:
                 ball_rect.y -= int(ny * overlap / 2)
 
     def collide_with_other(self, other):
-        dx = other.x - self.x
-        dy = other.y - self.y
-        dist = (dx ** 2 + dy ** 2) ** 0.5
-        min_dist = self.radius + other.radius
+        dx = self.x - other.x
+        dy = self.y - other.y
+        dist = max((dx ** 2 + dy ** 2) ** 0.5, 0.1)
+        combined_radius = self.radius + other.radius
 
-        if dist < min_dist:
-            # Normalize collision vector
+        if dist < combined_radius:
             nx = dx / dist
             ny = dy / dist
 
-            # Relative velocity
-            dvx = self.speed_x - other.speed_x
-            dvy = self.speed_y - other.speed_y
-            rel_velocity = dvx * nx + dvy * ny
+            # Reflect velocities
+            p1 = self.speed_x * nx + self.speed_y * ny
+            p2 = other.speed_x * nx + other.speed_y * ny
 
-            if rel_velocity > 0:
-                return  # They're moving apart already
+            self.speed_x += (p2 - p1) * nx
+            self.speed_y += (p2 - p1) * ny
 
-            # Swap velocity along normal
-            self.speed_x -= rel_velocity * nx
-            self.speed_y -= rel_velocity * ny
-            other.speed_x += rel_velocity * nx
-            other.speed_y += rel_velocity * ny
+            other.speed_x += (p1 - p2) * nx
+            other.speed_y += (p1 - p2) * ny
 
-            # Push them apart so they don't stick
-            overlap = min_dist - dist
-            self.x -= nx * overlap / 2
-            self.y -= ny * overlap / 2
-            other.x += nx * overlap / 2
-            other.y += ny * overlap / 2
+            # Separate them
+            overlap = combined_radius - dist
+            if overlap > 0:
+                self.x += nx * overlap / 2
+                self.y += ny * overlap / 2
+                other.x -= nx * overlap / 2
+                other.y -= ny * overlap / 2
 
     def draw(self, surface):
         pygame.draw.circle(surface, (220, 50, 50), (int(self.x), int(self.y)), self.radius)
@@ -97,20 +93,24 @@ class Demon:
         self.image_hit = img_hit
         self.image = img_normal
         self.rect = self.image.get_rect(topleft=(x, y))
-
+        self.health = 8
+        self.boss_group = []
         self.speed = 3
         self.direction = 1
         self.shoot_timer = 0
         self.balls = []
-
         self.hit = False
         self.hit_timer = 0
-
         self.screen_width = screen_width
         self.screen_height = screen_height
+        self.to_remove = False
 
     def update(self, ball_rect, ball_speed):
+        if self.to_remove:
+            return
+
         self.rect.x += self.speed * self.direction
+        self.boss_group.append(Demon)
 
         if self.rect.left <= 0:
             self.rect.left = 0
@@ -127,21 +127,26 @@ class Demon:
             self.shoot_timer -= 1
 
         # Update projectiles
-        for proj in self.balls:
-            proj.update()
-            proj.check_ball_collision(ball_rect, ball_speed)
+        for b in self.balls:
+            b.update()
+            b.check_ball_collision(ball_rect, ball_speed)
 
-        # ✅ Handle projectile-to-projectile bouncing
+        # Makes them balls bounce
         for i in range(len(self.balls)):
             for j in range(i + 1, len(self.balls)):
                 self.balls[i].collide_with_other(self.balls[j])
 
         # Remove off-screen projectiles
-        self.balls = [b for b in self.balls if 0 <= b.y <= self.screen_height]
+        self.balls = [b for b in self.balls if 0 <= b.y <= self.screen_height and not b.to_remove]
 
         # Check collision with player ball
         if self.rect.colliderect(ball_rect):
+            self.health -= 1
             self.take_damage()
+
+        # Check if health is depleted
+        if self.health <= 0:
+            self.destroy()
 
         # Sprite hit effect
         if self.hit:
@@ -160,7 +165,20 @@ class Demon:
         self.hit = True
         self.hit_timer = 30
 
-    def draw(self, surface):
-        surface.blit(self.image, self.rect.topleft)
+    def destroy(self):
+        # Mark this enemy for removal
+        self.to_remove = True
+        # Also mark all projectiles for removal
         for ball in self.balls:
-            ball.draw(surface)
+            ball.to_remove = True
+
+    def draw(self, surface):
+        if not self.to_remove:
+            surface.blit(self.image, self.rect.topleft)
+            for ball in self.balls:
+                if not ball.to_remove:
+                    ball.draw(surface)
+
+# Kills this SOB
+def remove_enemies(enemies_list):
+    return [enemy for enemy in enemies_list if not enemy.to_remove]
