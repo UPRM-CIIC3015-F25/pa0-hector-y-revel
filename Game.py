@@ -54,6 +54,8 @@ def do_i_jumpscare():
         jumpscare_sfx.play()
         jumpscare_vfx.start_animation()
         juampscare = True
+
+
 def maid():
     if random.randint(1, 1000) == 1:
         screen.blit(lebumbum, (0, 0))
