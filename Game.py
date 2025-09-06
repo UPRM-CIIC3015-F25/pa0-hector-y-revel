@@ -398,7 +398,6 @@ while True:
 
         timer -= 1
         delay -= 1
-        print(timer)
 
         # Other visuals
         if juampscare:
