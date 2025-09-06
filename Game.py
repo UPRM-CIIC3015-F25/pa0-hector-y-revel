@@ -33,10 +33,10 @@ def ball_movement():
             score += 1  # Increase player score
             ball_speed_y *= -1  # Reverse ball's vertical direction
             # DONE Task 6: Add sound effects HERE
-            paddle_touch_sound = pygame.mixer.Sound(file="deltarune-explosion.wav")
+            explosion = pygame.mixer.Sound(paddle_touch_sound)
             paddle_explosion_vfx.animate_next_frame(screen)
-            paddle_touch_sound.set_volume(0.3)
-            paddle_touch_sound.play()
+            explosion.set_volume(0.3)
+            explosion.play()
             # DONE BONUS: Add visual to correspond with paddle explosion sound
             paddle_explosion_vfx.start_animation()
             paddle_explosion_vfx.update_position((ball.x, ball.y - 50))
@@ -60,7 +60,7 @@ def ball_movement():
 def do_i_jumpscare():
     global juampscare
     if (random.randint(1, 1000) == 1) and (juampscare == False):
-        jumpscare_sfx = pygame.mixer.Sound(file="fnaf2-jumpscare-sound.wav")
+        jumpscare_sfx = pygame.mixer.Sound(file="songs_and_sfx/fnaf2-jumpscare-sound.wav")
         jumpscare_sfx.play()
         jumpscare_vfx.start_animation(hang_over=50)
         juampscare = True
@@ -261,21 +261,20 @@ player_start_pos_y = screen_height - 20
 player = pygame.Rect(player_start_pos_x, player_start_pos_y, player_width, player_height)  # Player paddle
 
  # Additional visuals
-paddle_explosion_vfx = anim_obj.AnimatedSprite(file_path="deltarune-realistic-explosion.png", rows=3, columns=6,
+paddle_explosion_vfx = anim_obj.AnimatedSprite(file_path="sprites_and_images/deltarune-realistic-explosion.png", rows=3, columns=6,
                                                position=(0, 0))
-jumpscare_vfx = anim_obj.AnimatedSprite(file_path="fnaf2-withered-foxy-jumpscare.png", rows=2, columns=7,
+jumpscare_vfx = anim_obj.AnimatedSprite(file_path="sprites_and_images/fnaf2-withered-foxy-jumpscare.png", rows=2, columns=7,
                                         position=(0,0))
-tenna_gif_vfx = anim_obj.AnimatedSprite(file_path="tenna-dancing-gif.png", rows=8, columns=13,
-                                        position=(screen_width - 100, screen_height - 200), looping=True)
-lebumbum = pygame.image.load('lebumbum.png')
-big_boss = pygame.image.load('big_boss.png')
+tenna_gif_vfx = anim_obj.AnimatedSprite(file_path="sprites_and_images/tenna-dancing-gif.png", rows=8, columns=13, position=(screen_width - 100, screen_height - 200), looping=True)
+lebumbum = pygame.image.load('sprites_and_images/lebumbum.png')
+big_boss = pygame.image.load('sprites_and_images/big_boss.png')
 pygame.transform.scale(lebumbum, (screen_height, screen_width))
 pygame.transform.scale(big_boss, (screen_width, screen_width))
 
 # Boss sprites and stuff
 
-ENEMY_IMG = pygame.image.load("cacodemon.png").convert_alpha()
-ENEMY_HIT_IMG = pygame.image.load("cacodemon2.png").convert_alpha()
+ENEMY_IMG = pygame.image.load("sprites_and_images/cacodemon.png").convert_alpha()
+ENEMY_HIT_IMG = pygame.image.load("sprites_and_images/cacodemon2.png").convert_alpha()
 ENEMY_IMG = pygame.transform.scale(ENEMY_IMG, (60, 60))
 ENEMY_HIT_IMG = pygame.transform.scale(ENEMY_HIT_IMG, (60, 60))
 boss = boss.Demon(screen_width // 2 - 30, 100, ENEMY_IMG, ENEMY_HIT_IMG, screen_width, screen_height)
@@ -285,17 +284,18 @@ ball_speed_x = 0
 ball_speed_y = 0
 player_speed = 0
 
-# Music
+# Music and sfx
 music_playing = False
 pygame.mixer.set_num_channels(8)
 channel_0 = pygame.mixer.Channel(0)
 pygame.mixer.music.set_volume(0.6)
-main_theme = 'a_cruel_angels_thesis_8-bit_cover_neon_genesis_evangelion_op.wav'
-boss_theme = "standing_here.wav"
-big_boss_mus = "invisible-duran.mp3"
-win_screen_mus = "theworld.mp3"
-kept_u_waiting = 'kept.mp3'
-game_mus = 'devil_may_cry_5_devil_trigger_nes_8-bit_remix.wav'
+main_theme = 'songs_and_sfx/a_cruel_angels_thesis_8-bit_cover_neon_genesis_evangelion_op.wav'
+boss_theme = "songs_and_sfx/standing_here.wav"
+big_boss_mus = "songs_and_sfx/invisible-duran.mp3"
+win_screen_mus = "songs_and_sfx/theworld.mp3"
+kept_u_waiting = 'songs_and_sfx/kept.mp3'
+game_mus = 'songs_and_sfx/devil_may_cry_5_devil_trigger_nes_8-bit_remix.wav'
+paddle_touch_sound = pygame.mixer.Sound(file="songs_and_sfx/deltarune-explosion.wav")
 
 
 # Visual declarations
