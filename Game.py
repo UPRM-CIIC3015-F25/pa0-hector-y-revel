@@ -48,8 +48,12 @@ def ball_movement():
 
 # Two separate logics for two different jumpscares
 def do_i_jumpscare():
-    if random.randint(1, 1000) == 1:
+    global juampscare
+    if (random.randint(1, 50) == 1) and (juampscare == False):
+        jumpscare_sfx = pygame.mixer.Sound(file="fnaf2-jumpscare-sound.wav")
+        jumpscare_sfx.play()
         jumpscare_vfx.start_animation()
+        juampscare = True
 def maid():
     if random.randint(1, 1000) == 1:
         screen.blit(lebumbum, (0, 0))
@@ -80,8 +84,10 @@ def restart():
 def menu():
     while True:
         screen.fill('black')
+        welcome_text = big_font.render(f'PONG', False, light_grey)
         start_text = basic_font.render(f'Press [SPACE] to start', False, light_grey)
-        screen.blit(start_text, (screen_width / 2 - 200, screen_height / 2 - 20))
+        screen.blit(start_text, (screen_width / 2 - 200, screen_height / 2 + 20))
+        screen.blit(welcome_text, (screen_width / 2 - 200, screen_height / 2 - 100))
         pygame.display.flip()
 
         for event in pygame.event.get():
@@ -118,7 +124,7 @@ player = pygame.Rect(player_start_pos_x, player_start_pos_y, player_width, playe
 
  # Additional visuals
 paddle_explosion_vfx = anim_obj.AnimatedSprite(file_path="deltarune-realistic-explosion.png", rows=3, columns=6, position=(ball.x, ball.y))
-jumpscare_vfx = anim_obj.AnimatedSprite(file_path="fnaf2-withered-foxy-jumpscare.png", rows=7, columns=2, position=(0,0))
+jumpscare_vfx = anim_obj.AnimatedSprite(file_path="fnaf2-withered-foxy-jumpscare.png", rows=2, columns=7, position=(0,0))
 lebumbum = pygame.image.load('lebumbum.png')
 pygame.transform.scale(lebumbum, (screen_height, screen_width))
 
@@ -129,7 +135,6 @@ ENEMY_HIT_IMG = pygame.image.load("cacodemon2.png").convert_alpha()
 ENEMY_IMG = pygame.transform.scale(ENEMY_IMG, (60, 60))
 ENEMY_HIT_IMG = pygame.transform.scale(ENEMY_HIT_IMG, (60, 60))
 boss = boss.Demon(screen_width // 2 - 30, 100, ENEMY_IMG, ENEMY_HIT_IMG, screen_width, screen_height)
-
 
 # Game Variables
 ball_speed_x = 0
@@ -153,9 +158,11 @@ blue = pygame.Color('blue')
 score = 0
 game_over = False
 basic_font = pygame.font.Font('freesansbold.ttf', 32)  # Font for displaying score
+big_font = pygame.font.Font('freesansbold.ttf', 128)
 
 start = False # Indicates if the game has started
 begin = False
+juampscare = False
 
 pygame.mixer.unpause()
 # Displays start menu
@@ -164,7 +171,6 @@ menu()
 # Main game loop
 while True:
 
-    #
     # Event handling
     # DONE Task 4: Add your name
     name = "John Doe"
@@ -183,6 +189,7 @@ while True:
                 ball.x, ball.y = ball_start_pos_xy, ball_start_pos_xy
                 player.x, player.y = player_start_pos_x, player_start_pos_y
                 game_over = False
+                juampscare = False
                 start = True  # Start the ball movement
         if event.type == pygame.KEYUP:
             if event.key == pygame.K_LEFT:
@@ -192,10 +199,11 @@ while True:
 
 
     if not game_over:
+
+        pygame.mixer.unpause()
         # Game Logic
         ball_movement()
         player_movement()
-        do_i_jumpscare()
         maid()
         boss.update(ball, [ball_speed_x, ball_speed_y])
 
@@ -221,8 +229,14 @@ while True:
         screen.blit(restart_text, (screen_width/2 - 200, screen_height/2 - 20))
         pygame.mixer.music.pause()
         pygame.mixer.music.play()
-        do_i_jumpscare()
 
-    # Update display
+        do_i_jumpscare()
+        if juampscare:
+            jumpscare_vfx.animate_next_frame(screen)
+
+
+
+
+# Update display
     pygame.display.flip()
     clock.tick(60)  # Maintain 60 frames per second
