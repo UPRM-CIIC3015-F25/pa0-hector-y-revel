@@ -122,8 +122,15 @@ jumpscare_vfx = anim_obj.AnimatedSprite(file_path="fnaf2-withered-foxy-jumpscare
 lebumbum = pygame.image.load('lebumbum.png')
 pygame.transform.scale(lebumbum, (screen_height, screen_width))
 
-# Boss
-enemy = boss.Demon(x=200, y=300, image_path="cacodemon.png", speed=2, move=150)
+# Boss sprites and stuff
+
+ENEMY_IMG = pygame.image.load("cacodemon.png").convert_alpha()
+ENEMY_HIT_IMG = pygame.image.load("cacodemon2.png").convert_alpha()
+ENEMY_IMG = pygame.transform.scale(ENEMY_IMG, (60, 60))
+ENEMY_HIT_IMG = pygame.transform.scale(ENEMY_HIT_IMG, (60, 60))
+boss = boss.Demon(screen_width // 2 - 30, 100, ENEMY_IMG, ENEMY_HIT_IMG, screen_width, screen_height)
+
+
 # Game Variables
 ball_speed_x = 0
 ball_speed_y = 0
@@ -157,9 +164,7 @@ menu()
 # Main game loop
 while True:
 
-    boss.Demon.update(enemy)
-    boss.Demon.draw(enemy, screen)
-
+    #
     # Event handling
     # DONE Task 4: Add your name
     name = "John Doe"
@@ -187,13 +192,12 @@ while True:
 
 
     if not game_over:
-
-        pygame.mixer.unpause()
         # Game Logic
         ball_movement()
         player_movement()
         do_i_jumpscare()
         maid()
+        boss.update(ball, [ball_speed_x, ball_speed_y])
 
         # Visuals
         screen.fill(bg_color)  # Clear screen with background color
@@ -203,6 +207,7 @@ while True:
         player_text = basic_font.render(f'{score}', False, light_grey)  # Render player score
         screen.blit(player_text, (screen_width/2 - 15, 10))  # Display score on screen
         maid()
+        boss.draw(screen)
         paddle_explosion_vfx.animate_next_frame(screen)
         jumpscare_vfx.animate_next_frame(screen)
         pygame.mixer.music.unpause()
@@ -216,7 +221,7 @@ while True:
         screen.blit(restart_text, (screen_width/2 - 200, screen_height/2 - 20))
         pygame.mixer.music.pause()
         pygame.mixer.music.play()
-
+        do_i_jumpscare()
 
     # Update display
     pygame.display.flip()
