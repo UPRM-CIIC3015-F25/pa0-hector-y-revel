@@ -104,6 +104,7 @@ class Demon:
         self.screen_width = screen_width
         self.screen_height = screen_height
         self.to_remove = False
+        self.max_health = self.health
 
     def update(self, ball_rect, ball_speed):
         if self.to_remove:
@@ -180,7 +181,8 @@ class Demon:
                     ball.draw(surface)
 
     def reset(self):
-        self.health = 150
+        self.health = self.health
+        self.health = self.max_health
         self.to_remove = False
 
     def is_dead(self):

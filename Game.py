@@ -89,10 +89,10 @@ def on_boss_death():
 
     # Reset music to normal
     pygame.mixer.music.stop()
+    pygame.mixer.music.load(main_theme)
     pygame.mixer.music.load(win_screen_mus)
     pygame.mixer.music.play(-1)
     main_music_playing = True
-
 # Things to do once in a game over
 def on_game_over():
     global boss_music_playing
@@ -182,7 +182,7 @@ def win_screen():
 
     # Start animations
     tenna_gif_vfx.start_animation()
-    screen.fill('black') # Feel free to put this back in the display loop, i was just trying to see if Foxy stuck but nah
+    screen.fill('black')
 
     while True:
         if not pygame.mixer.music.get_busy():
@@ -190,7 +190,7 @@ def win_screen():
             pygame.mixer.music.play(-1, 0.0)
             win_screen_music_playing = True
 
-
+        screen.fill('black')
         congrats = basic_font.render(f'YOU BEAT THE BOSS!!!', False, light_grey)
         final_score = basic_font.render(f'Your final score is {score}', False, light_grey)
         message = basic_font.render(f'Now give us our award...', False, light_grey)
@@ -199,6 +199,7 @@ def win_screen():
         screen.blit(message, (screen_width / 2 - 200, screen_height / 2 - 100))
         screen.blit(final_score, (screen_width / 2 - 200, screen_height / 2 - 150))
         screen.blit(congrats, (screen_width / 2 - 200, screen_height / 2 - 200))
+
         tenna_gif_vfx.animate_next_frame(screen)
 
         pygame.display.flip()
@@ -209,8 +210,13 @@ def win_screen():
 
             if event.type == pygame.KEYDOWN:
                 if event.key == pygame.K_SPACE:
-                    restart()
+                    pygame.mixer.music.stop()
+                    pygame.mixer.music.load(main_theme)
+                    pygame.mixer.music.play(-1)
+                    main_music_playing = True
+                    menu()
                     return
+
 
 # Determine whether boss should drop
 def boss_drop():
