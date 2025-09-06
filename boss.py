@@ -93,7 +93,7 @@ class Demon:
         self.image_hit = img_hit
         self.image = img_normal
         self.rect = self.image.get_rect(topleft=(x, y))
-        self.health = 8
+        self.health = 200
         self.boss_group = []
         self.speed = 3
         self.direction = 1

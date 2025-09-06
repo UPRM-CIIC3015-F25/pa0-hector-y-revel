@@ -1,5 +1,10 @@
 import anim_obj, pygame, sys, random, boss
 
+# Music state tracking
+boss_music_playing = False
+main_music_playing = False
+game_over_music_playing = False
+
 def ball_movement():
     """
     Handles the movement of the ball and collision detection with the player and screen boundaries.
@@ -55,11 +60,17 @@ def do_i_jumpscare():
         jumpscare_vfx.start_animation()
         juampscare = True
 
-
 def maid():
     if random.randint(1, 1000) == 1:
         screen.blit(lebumbum, (0, 0))
 
+def get_big_bossed():
+    if timer == 0:
+        pygame.mixer.music.stop()
+        bossed = pygame.mixer.Sound(file="invisible-duran.mp3")
+        bossed.set_volume(0.5)
+        bossed.play()
+        screen.blit(big_boss, (0, 0))
 
 def player_movement():
     """
@@ -84,7 +95,18 @@ def restart():
 
 # Menu logic (this took so much trial and error, not even god can help me now... all the crashouts)
 def menu():
+    global boss_music_playing, main_music_playing
+
+    # Reset music states when returning to menu
+    boss_music_playing = False
+    main_music_playing = False
+
     while True:
+        if not pygame.mixer.music.get_busy():
+            pygame.mixer.music.load(main_theme)
+            pygame.mixer.music.play(-1, 0.0)
+            main_music_playing = True
+
         screen.fill('black')
         welcome_text = big_font.render(f'PONG', False, light_grey)
         start_text = basic_font.render(f'Press [SPACE] to start', False, light_grey)
@@ -98,7 +120,29 @@ def menu():
 
             if event.type == pygame.KEYDOWN:
                 if event.key == pygame.K_SPACE:
+                    # Reset music for new game
+                    pygame.mixer.music.stop()
+                    pygame.mixer.music.load(main_theme)
+                    pygame.mixer.music.play(-1)
+                    main_music_playing = True
                     return
+
+def boss_drop():
+    global boss_music_playing
+
+    if score >= 20 and not boss_music_playing:
+        pygame.mixer.music.stop()
+        pygame.mixer.music.load(boss_theme)
+        pygame.mixer.music.play(-1)
+        boss_music_playing = True
+    elif score < 20 and boss_music_playing:
+        pygame.mixer.music.stop()
+        pygame.mixer.music.load(main_theme)
+        pygame.mixer.music.play(-1)
+        boss_music_playing = False
+
+    if score >= 20:
+        boss.draw(screen)
 
 # General setup
 pygame.mixer.pre_init(44100, -16, 1, 1024)
@@ -128,7 +172,9 @@ player = pygame.Rect(player_start_pos_x, player_start_pos_y, player_width, playe
 paddle_explosion_vfx = anim_obj.AnimatedSprite(file_path="deltarune-realistic-explosion.png", rows=3, columns=6, position=(ball.x, ball.y))
 jumpscare_vfx = anim_obj.AnimatedSprite(file_path="fnaf2-withered-foxy-jumpscare.png", rows=2, columns=7, position=(0,0))
 lebumbum = pygame.image.load('lebumbum.png')
+big_boss = pygame.image.load('big_boss.png')
 pygame.transform.scale(lebumbum, (screen_height, screen_width))
+pygame.transform.scale(big_boss, (screen_width, screen_width))
 
 # Boss sprites and stuff
 
@@ -142,14 +188,14 @@ boss = boss.Demon(screen_width // 2 - 30, 100, ENEMY_IMG, ENEMY_HIT_IMG, screen_
 ball_speed_x = 0
 ball_speed_y = 0
 player_speed = 0
+
 # Music
+music_playing = False
 pygame.mixer.set_num_channels(8)
 channel_0 = pygame.mixer.Channel(0)
-pygame.mixer.music.set_volume(0.2)
-pygame.mixer.music.load('theworld.mp3')
-pygame.mixer.music.load('a_cruel_angels_thesis_8-bit_cover_neon_genesis_evangelion_op.wav')
-pygame.mixer.fadeout(1000)
-pygame.mixer.music.play(-1, 0.0)
+pygame.mixer.music.set_volume(0.6)
+main_theme = 'a_cruel_angels_thesis_8-bit_cover_neon_genesis_evangelion_op.wav'
+boss_theme = "standing_here.wav"
 
 # Visual declarations
 light_grey = pygame.Color('grey83')
@@ -171,8 +217,11 @@ pygame.mixer.unpause()
 menu()
 
 # Main game loop
+timer = 100000
+
 while True:
 
+    # He boss
     # Event handling
     # DONE Task 4: Add your name
     name = "John Doe"
@@ -202,6 +251,8 @@ while True:
 
     if not game_over:
 
+        timer -= 1
+        print(timer)
         pygame.mixer.unpause()
         # Game Logic
         ball_movement()
@@ -216,8 +267,10 @@ while True:
         pygame.draw.ellipse(screen, blue, ball)  # Draw ball
         player_text = basic_font.render(f'{score}', False, light_grey)  # Render player score
         screen.blit(player_text, (screen_width/2 - 15, 10))  # Display score on screen
+        get_big_bossed()
         maid()
-        boss.draw(screen)
+        # Boss draw come back
+        boss_drop()
         paddle_explosion_vfx.animate_next_frame(screen)
         jumpscare_vfx.animate_next_frame(screen)
         pygame.mixer.music.unpause()
@@ -231,6 +284,10 @@ while True:
         screen.blit(restart_text, (screen_width/2 - 200, screen_height/2 - 20))
         pygame.mixer.music.pause()
         pygame.mixer.music.play()
+        pygame.mixer.music.stop()
+        pygame.mixer.music.load(boss_theme)
+        pygame.mixer.music.play(-1)
+        boss_music_playing = True
 
         do_i_jumpscare()
         if juampscare:
