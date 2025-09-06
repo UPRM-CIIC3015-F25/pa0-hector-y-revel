@@ -1,6 +1,8 @@
 import pygame
 import random
 
+MAX_HEALTH = 150
+
 class EnemyBall:
     def __init__(self, x, y, screen_width):
         self.radius = 18
@@ -93,7 +95,7 @@ class Demon:
         self.image_hit = img_hit
         self.image = img_normal
         self.rect = self.image.get_rect(topleft=(x, y))
-        self.health = 150
+        self.health = MAX_HEALTH
         self.boss_group = []
         self.speed = 3
         self.direction = 1
@@ -180,7 +182,7 @@ class Demon:
                     ball.draw(surface)
 
     def reset(self):
-        self.health = 150
+        self.health = MAX_HEALTH
         self.to_remove = False
 
     def is_dead(self):
