@@ -1,5 +1,7 @@
 import anim_obj, pygame, sys, random, boss
 
+# Solved a scary merge conflict
+
 # Music state tracking
 boss_music_playing = False
 main_music_playing = False
