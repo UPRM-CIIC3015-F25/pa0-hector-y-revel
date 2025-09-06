@@ -7,10 +7,13 @@ from pygame import Color as Colour
 # Inherits from SpriteSheet for the explicit use of playing animations
 class AnimatedSprite(SpriteSheet):
 
-    def __init__(self, file_path: str, columns: int, rows: int, position: tuple[int, int], colour_key: Colour = Colour(0, 0, 0), fps: int = 60) -> None:
+    def __init__(self, file_path: str, columns: int, rows: int, position: tuple[int, int],
+                 colour_key: Colour = Colour(0, 0, 0), can_loop: bool = False) -> None:
+
         SpriteSheet.__init__(self, file_path, columns, rows, colour_key)
 
         self.__anim_frames = -1
+        self.__can_loop = can_loop
         self.__position = position
 
     # Macro for playing the next frame in an animation
@@ -19,8 +22,10 @@ class AnimatedSprite(SpriteSheet):
             self.blit(surface=surface, sprite_id=self.__anim_frames, position=self.__position)
             self.__anim_frames += 1
 
-            if self.__anim_frames >= self.sprite_count():
+            if (self.__anim_frames >= self.sprite_count()) and not self.__can_loop:
                 self.__anim_frames = -1
+            else:
+                self.__anim_frames = 0
 
     # Macro for initializing an animation
     def start_animation(self):
